@@ -4,6 +4,7 @@ pipeline {
         DOCKER_IMAGE = "unname-app:${env.BUILD_NUMBER}"
         REMOTE_SERVER = "31.129.49.244"
         SSH_CREDS = "server-ssh-creds"
+        DOCKER_PATH = "C:\\Program Files\\Docker\\Docker\\Resources\\bin\\docker.exe"
     }
     stages {
         stage('Checkout') {
