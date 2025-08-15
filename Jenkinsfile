@@ -28,7 +28,7 @@ pipeline {
             steps {
                 script {
                     // Явное указание пути к Docker для Windows
-                    bat '"C:\\Program Files\\Docker\\Docker\\Resources\\bin\\docker.exe" build -t "${DOCKER_IMAGE}" .'
+                    bat "\"${env.DOCKER_PATH}\" build -t ${env.DOCKER_IMAGE} ."
                 }
             }
         }
