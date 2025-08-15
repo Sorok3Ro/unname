@@ -28,8 +28,11 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Явное указание пути к Docker для Windows
-                    bat "docker -H tcp://localhost:2375 build -t \"${DOCKER_IMAGE}\" ."
+                // Проверка существования Docker
+                    bat "\"${DOCKER_PATH}\" --version || echo Docker not found"
+                    
+                    // Сборка образа
+                    bat "\"${DOCKER_PATH}\" build -t \"${DOCKER_IMAGE}\" ."
                 }
             }
         }
