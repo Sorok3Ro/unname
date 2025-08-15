@@ -47,9 +47,6 @@ pipeline {
         stage('Deploy to Server') {
             steps {
                 script {
-                    // Сохраняем Docker-образ в .tar
-                    bat '"C:\\Program Files\\Docker\\Docker\\Resources\\bin\\docker.exe" save -o image.tar ${DOCKER_IMAGE}'
-                    
                     // Копируем образ на сервер
                     sshPut(
                         remote: REMOTE_SERVER,
