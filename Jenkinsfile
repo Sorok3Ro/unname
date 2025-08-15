@@ -36,6 +36,14 @@ pipeline {
                 }
             }
         }
+         stage('Save Docker Image') {
+            steps {
+                script {
+                    // Сохраняем Docker-образ в .tar
+                    bat "\"${env.DOCKER_PATH}\" save -o image.tar ${env.DOCKER_IMAGE}"
+                }
+            }
+        }
         stage('Deploy to Server') {
             steps {
                 script {
