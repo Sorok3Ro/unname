@@ -64,7 +64,7 @@ pipeline {
     post {
         always {
             // Очистка временных файлов для Windows
-            bat 'del /f image.tar'
+            bat 'del /f image.tar 2>nul || echo No image.tar to delete'
         }
     }
 }
