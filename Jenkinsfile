@@ -59,7 +59,6 @@ pipeline {
                         keyFileVariable: 'sshKey'
                     )]) {
                         sshConfig.identityFile = sshKey
-                        
                     // Копируем образ на сервер
                     sshPut(
                         remote: REMOTE_SERVER,
