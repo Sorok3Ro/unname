@@ -29,7 +29,7 @@ pipeline {
             steps {
                 script {
                     // Явное указание пути к Docker для Windows
-                    bat "\"${env.DOCKER_PATH}\" build -t ${env.DOCKER_IMAGE} ."
+                    bat "docker -H tcp://localhost:2375 build -t \"${DOCKER_IMAGE}\" ."
                 }
             }
         }
