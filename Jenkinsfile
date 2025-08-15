@@ -21,7 +21,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build(DOCKER_IMAGE)
+                    // Явное указание пути к Docker для Windows
+                    bat '"C:\\Program Files\\Docker\\Docker\\Resources\\bin\\docker.exe" build -t "${DOCKER_IMAGE}" .'
                 }
             }
         }
@@ -29,7 +30,7 @@ pipeline {
             steps {
                 script {
                     // Сохраняем Docker-образ в .tar
-                    docker.image(DOCKER_IMAGE).save('image.tar')
+                    bat '"C:\\Program Files\\Docker\\Docker\\Resources\\bin\\docker.exe" save -o image.tar ${DOCKER_IMAGE}'
                     
                     // Копируем образ на сервер
                     sshPut(
@@ -56,8 +57,8 @@ pipeline {
     }
     post {
         always {
-            // Очистка временных файлов
-            sh 'rm -f image.tar'
+            // Очистка временных файлов для Windows
+            bat 'del /f image.tar'
         }
     }
 }
