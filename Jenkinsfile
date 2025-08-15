@@ -47,6 +47,19 @@ pipeline {
         stage('Deploy to Server') {
             steps {
                 script {
+                    // Подготовка конфигурации для SSH
+                    def sshConfig = [
+                        user: env.REMOTE_USER,
+                        host: env.REMOTE_SERVER,
+                        allowAnyHosts: true
+                    ]
+                    // Используем withCredentials для SSH
+                    withCredentials([sshUserPrivateKey(
+                        credentialsId: env.SSH_CREDS,
+                        keyFileVariable: 'sshKey'
+                    )]) {
+                        sshConfig.identityFile = sshKey
+                        
                     // Копируем образ на сервер
                     sshPut(
                         remote: REMOTE_SERVER,
