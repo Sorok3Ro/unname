@@ -50,12 +50,12 @@ pipeline {
                     sshCommand(
                         remote: REMOTE_SERVER,
                         credentialsId: SSH_CREDS,
-                        command: 
+                        command: '''
                             docker load -i /tmp/image.tar && \
                             docker stop unname-container || true && \
                             docker rm unname-container || true && \
-                            docker run -d --name unname-container -p 8080:80 ${DOCKER_IMAGE}
-                        
+                            docker run -d --name unname-container -p 8080:80 ${DOCKER_IMAGE} 
+                        '''
                     )
                 }
             }
