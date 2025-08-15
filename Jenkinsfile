@@ -23,8 +23,8 @@ pipeline {
              steps {
                      bat '"C:\\Program Files\\Docker\\Docker\\Resources\\bin\\docker.exe" --version'
                      bat '"C:\\Program Files\\Docker\\Docker\\Resources\\bin\\docker.exe" images'
-    }
-}
+                   }
+        }
         stage('Build Docker Image') {
             steps {
                 script {
@@ -87,4 +87,6 @@ pipeline {
             // Очистка временных файлов для Windows
             bat 'del /f image.tar 2>nul || echo No image.tar to delete'
         }
+    }
+    }
 }
