@@ -3,6 +3,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = "unname-app:${env.BUILD_NUMBER}"
         REMOTE_SERVER = "31.129.49.244"
+        REMOTE_USER = "root"  // Добавьте имя пользователя для SSH
         SSH_CREDS = "server-ssh-creds"
         DOCKER_PATH = "C:\\Program Files\\Docker\\Docker\\Resources\\bin\\docker.exe"
     }
@@ -20,15 +21,15 @@ pipeline {
             }
         }
         stage('Test Docker') {
-             steps {
-                     bat '"C:\\Program Files\\Docker\\Docker\\Resources\\bin\\docker.exe" --version'
-                     bat '"C:\\Program Files\\Docker\\Docker\\Resources\\bin\\docker.exe" images'
-                   }
+            steps {
+                bat '"C:\\Program Files\\Docker\\Docker\\Resources\\bin\\docker.exe" --version'
+                bat '"C:\\Program Files\\Docker\\Docker\\Resources\\bin\\docker.exe" images'
+            }
         }
         stage('Build Docker Image') {
             steps {
                 script {
-                // Проверка существования Docker
+                    // Проверка существования Docker
                     bat "\"${DOCKER_PATH}\" --version || echo Docker not found"
                     
                     // Сборка образа
@@ -36,7 +37,7 @@ pipeline {
                 }
             }
         }
-         stage('Save Docker Image') {
+        stage('Save Docker Image') {
             steps {
                 script {
                     // Сохраняем Docker-образ в .tar
@@ -47,46 +48,36 @@ pipeline {
         stage('Deploy to Server') {
             steps {
                 script {
-                    // Подготовка конфигурации для SSH
-                    def sshConfig = [
-                        user: env.REMOTE_USER,
-                        host: env.REMOTE_SERVER,
-                        allowAnyHosts: true
-                    ]
-                    // Используем withCredentials для SSH
+                    // Получаем SSH-ключ через withCredentials
                     withCredentials([sshUserPrivateKey(
                         credentialsId: env.SSH_CREDS,
-                        keyFileVariable: 'sshKey'
+                        keyFileVariable: 'sshKey',
+                        usernameVariable: 'sshUser'
                     )]) {
-                        sshConfig.identityFile = sshKey
-                    // Копируем образ на сервер
-                    sshPut(
-                        remote: REMOTE_SERVER,
-                        credentialsId: SSH_CREDS,
-                        from: 'image.tar',
-                        into: '/tmp/'
-                    )
-                    
-                    // Загружаем образ и запускаем контейнер
-                    sshCommand(
-                        remote: REMOTE_SERVER,
-                        credentialsId: SSH_CREDS,
-                        command: """
-                            docker load -i /tmp/image.tar && \
-                            docker stop unname-container || true && \
-                            docker rm unname-container || true && \
-                            docker run -d --name unname-container -p 8080:80 ${DOCKER_IMAGE} 
-                        """
-                    )
+                        // Используем явное указание параметров подключения
+                        sshPut(
+                            remote: env.REMOTE_SERVER,
+                            user: env.REMOTE_USER,
+                            identityFile: sshKey,
+                            allowAnyHosts: true,
+                            from: 'image.tar',
+                            into: '/tmp/'
+                        )
+                        
+                        // Аналогично для sshCommand
+                        sshCommand(
+                            remote: env.REMOTE_SERVER,
+                            user: env.REMOTE_USER,
+                            identityFile: sshKey,
+                            allowAnyHosts: true,
+                            command: "docker load -i /tmp/image.tar && " +
+                                     "docker stop unname-container || true && " +
+                                     "docker rm unname-container || true && " +
+                                     "docker run -d --name unname-container -p 8080:80 ${env.DOCKER_IMAGE}"
+                        )
+                    }
                 }
             }
         }
-    }
-    post {
-        always {
-            // Очистка временных файлов для Windows
-            bat 'del /f image.tar 2>nul || echo No image.tar to delete'
-        }
-    }
     }
 }
