@@ -56,9 +56,9 @@ pipeline {
                     )]) {
                         // Используем явное указание параметров подключения
                         sshPut(
-                            remote: env.REMOTE_SERVER,
+                            host: env.REMOTE_SERVER,
                             user: env.REMOTE_USER,
-                            identityFile: sshKey,
+                            key: sshKey,
                             allowAnyHosts: true,
                             from: 'image.tar',
                             into: '/tmp/'
@@ -66,9 +66,9 @@ pipeline {
                         
                         // Аналогично для sshCommand
                         sshCommand(
-                            remote: env.REMOTE_SERVER,
+                            host: env.REMOTE_SERVER,
                             user: env.REMOTE_USER,
-                            identityFile: sshKey,
+                            key: sshKey,
                             allowAnyHosts: true,
                             command: "docker load -i /tmp/image.tar && " +
                                      "docker stop unname-container || true && " +
