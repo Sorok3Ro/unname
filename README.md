@@ -1,5 +1,5 @@
 # Gitlab Runner
-a
+aЗЦЙ
 ### Запуск раннера
 ```
 docker run -d --name gitlab-runner --restart always \
